@@ -16,7 +16,7 @@ import (
 var (
 	collectorURL = os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
 	insecure     = os.Getenv("INSECURE_MODE")
-	meltAPIKey   = os.Getenv("MELT_API_KEY")
+	mwAPIKey     = os.Getenv("MW_API_KEY")
 )
 
 func InitTracer(serviceName string) func(context.Context) error {
@@ -42,7 +42,7 @@ func InitTracer(serviceName string) func(context.Context) error {
 			attribute.String("service.name", serviceName),
 			attribute.String("library.language", "go"),
 			attribute.Bool("mw_agent", true),
-			attribute.String("mw.account_key", meltAPIKey),
+			attribute.String("mw.account_key", mwAPIKey),
 		),
 	)
 	if err != nil {
