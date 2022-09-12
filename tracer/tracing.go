@@ -8,6 +8,7 @@ import (
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	oteltrace "go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/credentials"
 	"log"
 	"os"
@@ -15,15 +16,11 @@ import (
 
 var (
 	collectorURL = os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
-	insecure     = os.Getenv("INSECURE_MODE")
 	mwAPIKey     = os.Getenv("MW_API_KEY")
 )
 
 func InitTracer(serviceName string) func(context.Context) error {
 	secureOption := otlptracegrpc.WithTLSCredentials(credentials.NewClientTLSFromCert(nil, ""))
-	if len(insecure) > 0 {
-		secureOption = otlptracegrpc.WithInsecure()
-	}
 
 	exporter, err := otlptrace.New(
 		context.Background(),
@@ -57,4 +54,13 @@ func InitTracer(serviceName string) func(context.Context) error {
 		),
 	)
 	return exporter.Shutdown
+}
+
+func CreateTracer(serviceName string) oteltrace.Tracer {
+	var tracer = otel.Tracer(serviceName)
+	return tracer
+}
+
+func WithAttributes(attributes attribute.KeyValue) oteltrace.SpanStartEventOption {
+	return oteltrace.WithAttributes(attributes)
 }
